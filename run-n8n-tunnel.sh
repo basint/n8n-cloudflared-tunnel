@@ -38,7 +38,7 @@ CLOUDFLARED_DIR="$HOME/.cloudflared"
 : "${HOST_DATA_DIR:=$HOME/Documents/Docker/n8n-data}"
 : "${CONTAINER_NAME:=n8n}"
 CONFIG_FILE="$CLOUDFLARED_DIR/config.yml"
-WEBHOOK_URL="$DOMAIN_NAME"
+WEBHOOK_URL="https://$DOMAIN_NAME"
 
 # Cleanup function: called on Ctrl+C or termination signal
 cleanup() {
