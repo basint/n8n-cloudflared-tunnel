@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# Logs
+*.log
+
+# n8n/Cloudflared
+*.json
+config.yml
+
+# Docker
+*.pid
+*.sock
+
+# Credentials & sensitive
+*.env
+*.secret
+*.bak
+
