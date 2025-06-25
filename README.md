@@ -28,6 +28,12 @@ This script automates the setup of Cloudflared Tunnel and helps you securely exp
 - Colorful, timestamped logs and graceful shutdown on Ctrl+C
 - Supports overriding key environment variables via command-line arguments
 
+## [Update] Always Pull Latest n8n Docker Image
+
+- The script now automatically pulls the latest `n8nio/n8n:latest` Docker image before starting or recreating the container.
+- This ensures you always run the most up-to-date version of n8n without manual intervention.
+- No additional action is required; the update is handled automatically within the script.
+
 ## Prerequisites
 - Docker installed and running
 - Cloudflared installed and authenticated (`cloudflared tunnel login`)

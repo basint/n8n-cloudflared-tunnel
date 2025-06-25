@@ -32,7 +32,7 @@ while getopts "h:t:c:d:n:" opt; do
 
 # Set variables for cloudflared and n8n (with defaults if not set by CLI)
 CLOUDFLARED_DIR="$HOME/.cloudflared"
-: "${DOMAIN_NAME:=yourdomain.com}"
+: "${DOMAIN_NAME:=n8n.vkimone.online}"
 : "${TUNNEL_NAME:=n8n-tunnel}"
 : "${CREDENTIALS_FILE:=$CLOUDFLARED_DIR/bbdef245-d94c-44f8-8a2c-dab3533abebb.json}"
 : "${HOST_DATA_DIR:=$HOME/Documents/Docker/n8n-data}"
@@ -64,7 +64,12 @@ ingress:
   - service: http_status:404
 EOF
 
-# Step 2: Check and run n8n docker container
+# Step 2: Always pull the latest n8n image before running container
+  echo -e "$(get_timestamp) INF ${CYAN}[✔]${RESET} ${YELLOW}⬇️  ${BOLD}Pulling the latest n8n docker image...${RESET_BOLD}${RESET}"
+  docker pull n8nio/n8n:latest
+  N8N_VERSION=$(docker run --rm n8nio/n8n:latest n8n --version 2>/dev/null)
+
+# Step 3: Check and run n8n docker container
 # If the container does not exist, create and initialize it with utility tools
 if ! docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
   echo -e "$(get_timestamp) INF ${CYAN}[✔]${RESET} ${YELLOW}🐳 ${BOLD}n8n container not found. Creating a new one.${RESET_BOLD}${RESET}"
@@ -92,7 +97,7 @@ else
   fi
 fi
 
-# Step 3: Always (re)create DNS route between tunnel and domain
+# Step 4: Always (re)create DNS route between tunnel and domain
 # This ensures the tunnel is mapped to the custom domain, forcibly updating the record
   echo -e "$(get_timestamp) INF ${CYAN}[✔]${RESET} ${YELLOW}🌐 ${BOLD}Forcibly mapping tunnel to domain via DNS route.${RESET_BOLD}${RESET}"
   ROUTE_OUTPUT=$(cloudflared tunnel route dns $TUNNEL_NAME $DOMAIN_NAME 2>&1)
@@ -105,7 +110,7 @@ fi
     echo -e "$(get_timestamp) ERR ${RED}[✖]${RESET} ${RED}🌐 ${BOLD}Failed to map tunnel to domain. Output:${RESET_BOLD}${RESET}\n$ROUTE_OUTPUT"
   fi
 
-# Step 4: Run the cloudflared tunnel in the background
+# Step 5: Run the cloudflared tunnel in the background
 # This exposes the local n8n service to the public via the custom domain
 
 echo -e "$(get_timestamp) INF ${CYAN}[✔]${RESET} ${YELLOW}🚀 ${BOLD}Running cloudflared tunnel in the background.${RESET_BOLD}${RESET}"
@@ -114,13 +119,13 @@ CF_PID=$!
 
 sleep 3
 
-# Step 5: Print status and access information
+# Step 6: Print status and access information
 N8N_LOCAL_URL="http://localhost:5678"
-echo -e "$(get_timestamp) INF ${CYAN}[✔]${RESET} ${YELLOW}✅ ${BOLD}n8n is running at $N8N_LOCAL_URL${RESET_BOLD}${RESET}"
+echo -e "$(get_timestamp) INF ${CYAN}[✔]${RESET} ${YELLOW}✅ ${BOLD}n8n (v$N8N_VERSION) is running at $N8N_LOCAL_URL${RESET_BOLD}${RESET}"
 echo -e "$(get_timestamp) INF ${CYAN}[✔]${RESET} ${YELLOW}🌐 ${BOLD}External access URL: https://$DOMAIN_NAME${RESET_BOLD}${RESET}"
 echo -e "$(get_timestamp) INF ${CYAN}[✔]${RESET} ${GRAY}💡 ${BOLD}Press Ctrl+C to stop the tunnel and clean up.${RESET_BOLD}${RESET}"
 
-# Step 6: Wait indefinitely until interrupted
+# Step 7: Wait indefinitely until interrupted
 while true; do
   sleep 60
 done
