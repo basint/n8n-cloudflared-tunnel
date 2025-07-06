@@ -22,4 +22,4 @@ jobs:
       - name: Start Cloudflared Tunnel
         run: |
           echo "${{ secrets.CLOUDFLARED_JSON }}" > tunnel.json
-          npx cloudflared tunnel --cred-file tunnel.json --url http://localhost:5678
+          npx cloudflared tunnel --cred-file tunnel.json run n8n-Tunnel
